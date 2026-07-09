@@ -1,0 +1,35 @@
+# Refreshes your live SlickFast dashboard on a schedule — and on the FIRST run,
+# automatically inserts the dashboard into your README for you.
+name: pulse
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'   # every 6 hours — ~120 renders/mo, well inside a free key's 250
+  workflow_dispatch: {}      # run manually from the Actions tab (do this once after setup)
+
+permissions:
+  contents: write            # lets the first run add the dashboard to your README
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Push fresh stats to your live chart
+        run: node update-dashboard.mjs
+        env:
+          SLICKFAST_KEY: ${{ secrets.SLICKFAST_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LAYOUT: ${{ vars.LAYOUT }}
+      - name: Wire the dashboard into the README (first run only)
+        run: |
+          if ! git diff --quiet README.md 2>/dev/null; then
+            git config user.name "slickfast-dashboard"
+            git config user.email "actions@users.noreply.github.com"
+            git add README.md
+            git commit -m "Add live SlickFast dashboard to README"
+            git push
+          fi
