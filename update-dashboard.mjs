@@ -72,6 +72,12 @@ async function contributorCount() {
   const arr = await r.json().catch(() => []);
   return Array.isArray(arr) ? arr.length : null;
 }
+async function ciGreenPct() {
+  const j = await gh('actions/runs?per_page=20');
+  const runs = ((j && j.workflow_runs) || []).filter((w) => w.conclusion);
+  if (!runs.length) return null;
+  return Math.round((runs.filter((w) => w.conclusion === 'success').length / runs.length) * 100);
+}
 async function languages() {
   const j = await gh('languages');
   if (!j) return [];
@@ -86,6 +92,11 @@ const commitsArea = (commits, span) => ({ ...(span ? { span } : {}), chart: { ty
   data: { labels: commits.map(() => ''), series: [{ values: commits.length ? commits : [0], color: GREEN }] } } });
 
 function buildSpec(d) {
+  if (cfg.layout === 'ci') {
+    // singular tile: just the CI health gauge — a live "build passing" badge, upgraded
+    return { type: 'gauge', title: `CI runs green — ${cfg.repo}`, label: 'last 20 runs',
+      value: d.ciPct ?? 0, min: 0, max: 100, valueUnit: '%', background: BG, color: GREEN };
+  }
   const base = { type: 'dashboard', title: cfg.repo, background: BG, layout: { cols: 3, gap: 16, pad: 20, tileHeight: 190 } };
   const kpis3 = [kpi('Stars', d.stars, { sparkline: spark(d.stars) }), kpi('Forks', d.forks), kpi('Open issues', d.openIssues)];
 
@@ -151,13 +162,14 @@ function updateReadme(svgUrl) {
   try {
     const b = await basics();
     const wants = cfg.layout;
-    const [commits, top, cc, langs] = await Promise.all([
-      commitsWeekly(),
+    const [commits, top, cc, langs, ciPct] = await Promise.all([
+      wants === 'ci' ? Promise.resolve([]) : commitsWeekly(),
       wants === 'contributors' ? topContributors() : Promise.resolve([]),
-      topContributors === null ? null : contributorCount(),
+      wants === 'ci' ? Promise.resolve(null) : contributorCount(),
       wants === 'graphs' ? languages() : Promise.resolve([]),
+      wants === 'ci' ? ciGreenPct() : Promise.resolve(null),
     ]);
-    const d = { ...b, commits, top, contributorCount: cc, langs };
+    const d = { ...b, commits, top, contributorCount: cc, langs, ciPct };
     console.log(`repo=${cfg.repo} layout=${cfg.layout} data=${JSON.stringify({ ...b, commits: commits.length, contributors: cc })}`);
     const out = await push(buildSpec(d));
     console.log(`\n✓ dashboard live: ${out.svg}`);
