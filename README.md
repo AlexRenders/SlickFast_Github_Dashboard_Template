@@ -29,7 +29,7 @@ exact template:
 
 | `LAYOUT` | Looks like | Best for |
 |---|---|---|
-| `strip` *(default)* | [live example](https://api.slickfast.com/live/b2e8b5da04d2cb91f3bf081709b79fe9.svg) — 3 stats + wide commits graph | most READMEs |
+| `strip` *(default)* | [live example](https://api.slickfast.com/live/b2e8b5da04d2cb91f3bf081709b79fe9.svg) — 3 stats over 3 graphs (commits trend, commits bars, languages) | most READMEs |
 | `square` | [live example](https://api.slickfast.com/live/d065ee3966c3b861df8ae55cee378c96.svg) — 4 stats, commits graph below | compact |
 | `contributors` | [live example](https://api.slickfast.com/live/4f1c8602e8fefdd4336aadc505acefa0.svg) — stats + top-contributor bars + commits | team projects |
 | `graphs` | [live example](https://api.slickfast.com/live/bb8ec3f266428ac25ec20e09fb4b0c4c.svg) — commits + languages, all graphs | data lovers |

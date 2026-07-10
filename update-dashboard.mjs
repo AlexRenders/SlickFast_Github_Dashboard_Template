@@ -126,8 +126,17 @@ function buildSpec(d) {
           data: { labels: d.langs.map((l) => l.label), series: [{ values: d.langs.map((l) => l.value), colors: d.langs.map(() => BLUE) }] } } },
       ] };
   }
-  // strip (default) and light: 3 stats + wide commits graph
-  return { ...base, tiles: [...kpis3, commitsArea(d.commits, [3, 1])] };
+  // default (and light): THE main GitHub board — 6 tiles, 2 rows.
+  // Row 1: stats. Row 2: three graphs — commits trend, commits bars, languages.
+  const last8 = d.commits.slice(-8);
+  return { ...base, layout: { cols: 3, gap: 16, pad: 20, tileHeight: 235 },
+    tiles: [...kpis3,
+      commitsArea(d.commits),
+      { chart: { type: 'horizontal', title: 'Commits — last 8 weeks', background: T, showValues: true,
+        data: { labels: last8.map((_, i) => `W${i + 1}`), series: [{ values: last8.length ? last8 : [0], colors: last8.map(() => GREEN) }] } } },
+      { chart: { type: 'horizontal', title: 'Languages — % of code', background: T, showValues: true, valueUnit: '%',
+        data: { labels: d.langs.length ? d.langs.map((l) => l.label) : ['n/a'], series: [{ values: d.langs.length ? d.langs.map((l) => l.value) : [0], colors: (d.langs.length ? d.langs : [0]).map(() => BLUE) }] } } },
+    ] };
 }
 
 // ── push + auto-README ────────────────────────────────────────────────────────
@@ -166,7 +175,7 @@ function updateReadme(svgUrl) {
       wants === 'ci' ? Promise.resolve([]) : commitsWeekly(),
       wants === 'contributors' ? topContributors() : Promise.resolve([]),
       wants === 'ci' ? Promise.resolve(null) : contributorCount(),
-      wants === 'graphs' ? languages() : Promise.resolve([]),
+      wants === 'ci' ? Promise.resolve([]) : languages(),
       wants === 'ci' ? ciGreenPct() : Promise.resolve(null),
     ]);
     const d = { ...b, commits, top, contributorCount: cc, langs, ciPct };
