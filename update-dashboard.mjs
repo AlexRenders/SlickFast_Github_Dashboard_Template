@@ -11,7 +11,7 @@
 // use the Action's built-in token — no personal token needed, ever.
 //
 // Layout: set repo variable LAYOUT to strip (default) | square | contributors |
-// graphs | light.
+// graphs | teal | light.
 
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 
@@ -97,6 +97,20 @@ async function languages() {
   return Object.entries(j).slice(0, 5).map(([k, v]) => ({ label: k, value: Math.max(1, Math.round((v / total) * 100)) }));
 }
 
+async function commitsDailyCalendar() {
+  const a = await gh('stats/commit_activity', { retry202: true });
+  if (!Array.isArray(a)) return {};
+  const days = {};
+  for (const week of a) {
+    const start = new Date(week.week * 1000);
+    for (let d = 0; d < 7; d++) {
+      const date = new Date(start.getTime() + d * 86400000);
+      if (week.days[d] > 0) days[date.toISOString().slice(0, 10)] = week.days[d];
+    }
+  }
+  return days;
+}
+
 // ── tiles ─────────────────────────────────────────────────────────────────────
 const kpi = (label, value, extra = {}) => ({ chart: { type: 'kpi', label, value, background: T, ...extra } });
 const spark = (v) => { const s = Math.max(1, Math.round(v * 0.9)); return [s, Math.round((s + v) / 2), v]; };
@@ -146,6 +160,26 @@ function buildSpec(d) {
           data: { labels: d.langs.map((l) => l.label), series: [{ values: d.langs.map((l) => l.value), colors: d.langs.map(() => BLUE) }] } } },
       ] };
   }
+  if (cfg.layout === 'teal') {
+    const TB = '#0a0f14', TT = '#0f1720', TC = '#22d3ee';
+    const tealColors = ['#22d3ee', '#2dd4bf', '#67e8f9', '#5eead4', '#a5f3fc'];
+    const yr = new Date().getFullYear();
+    return { type: 'dashboard', title: `${cfg.repo}  ·  live`, background: TB,
+      layout: { cols: 4, gap: 14, pad: 18, tileHeight: 150 },
+      tiles: [
+        { chart: { type: 'kpi', label: 'Stars', value: d.stars, background: TT, color: TC, fontSize: 26, sparkline: spark(d.stars) } },
+        { chart: { type: 'kpi', label: 'Forks', value: d.forks, background: TT, color: '#2dd4bf', fontSize: 26 } },
+        { chart: { type: 'kpi', label: 'Contributors', value: d.contributorCount ?? d.watchers, background: TT, color: '#5eead4', fontSize: 26 } },
+        { chart: { type: 'gauge', label: 'CI green', value: d.ciPct ?? 0, min: 0, max: 100, valueUnit: '%', background: TT, color: TC } },
+        { span: [4, 1], chart: { type: 'calendar', year: yr, days: d.calendarDays || {}, background: TT, color: TC } },
+        { span: [2, 2], chart: { type: 'area', title: 'Commits per week', background: TT, titleAlign: 'left',
+          data: { labels: d.commits.map(() => ''), series: [{ values: d.commits.length ? d.commits : [0], color: TC }] } } },
+        { span: [2, 2], chart: { type: 'horizontal', title: 'Languages', background: TT, axis: false, titleAlign: 'left', showValues: true, valueUnit: '%',
+          data: { labels: d.langs.length ? d.langs.map(l => l.label) : ['n/a'],
+            series: [{ values: d.langs.length ? d.langs.map(l => l.value) : [0],
+              colors: d.langs.length ? d.langs.map((_, i) => tealColors[i % tealColors.length]) : [TC] }] } } },
+      ] };
+  }
   // default (and light): THE main GitHub board — 6 tiles, 2 rows.
   // Row 1: stats. Row 2: three graphs — commits trend, commits bars, languages.
   const last8 = d.commits.slice(-8);
@@ -192,15 +226,16 @@ function updateReadme(svgUrl) {
     const b = await basics();
     const wants = cfg.layout;
     const single = wants === 'ci' || wants === 'release'; // singular tiles skip the board data
-    const [commits, top, cc, langs, ciPct, rel] = await Promise.all([
+    const [commits, top, cc, langs, ciPct, rel, calendarDays] = await Promise.all([
       single ? Promise.resolve([]) : commitsWeekly(),
       wants === 'contributors' ? topContributors() : Promise.resolve([]),
       single ? Promise.resolve(null) : contributorCount(),
       single ? Promise.resolve([]) : languages(),
-      wants === 'ci' ? ciGreenPct() : Promise.resolve(null),
+      wants === 'ci' || wants === 'teal' ? ciGreenPct() : Promise.resolve(null),
       wants === 'release' ? latestReleaseInfo() : Promise.resolve(null),
+      wants === 'teal' ? commitsDailyCalendar() : Promise.resolve({}),
     ]);
-    const d = { ...b, commits, top, contributorCount: cc, langs, ciPct, rel };
+    const d = { ...b, commits, top, contributorCount: cc, langs, ciPct, rel, calendarDays };
     console.log(`repo=${cfg.repo} layout=${cfg.layout} data=${JSON.stringify({ ...b, commits: commits.length, contributors: cc })}`);
     const out = await push(buildSpec(d));
     console.log(`\n✓ dashboard live: ${out.svg}`);
