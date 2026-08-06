@@ -1,7 +1,14 @@
+<p align="center">
+  <img src="assets/showcase-teal.png" alt="SlickFast GitHub dashboard — teal showcase board" width="100%">
+</p>
+<p align="center"><sub><b>Showcase</b> of what the engine can render — retina-crisp, brand-teal, contribution heatmap and all. In a README it's served as <b>SVG: pixel-perfect at any zoom, ~35&nbsp;KB</b>. The ready-to-use live layouts are below ⬇ (the contribution-calendar layout is an advanced preview — coming soon).</sub></p>
+
 # 📈 Live GitHub Dashboard Template
 
 **One click + one SlickFast key = a live dashboard on your GitHub README.**
 Real stats — stars, forks, issues, commits-per-week — in one image that **updates itself.**
+Your README doesn't have to be flat badges and blurry stat cards — drop in one URL, get a
+full dashboard that's **vector-sharp at any zoom and updates itself.**
 
 This very repo runs the template. The dashboard below is live:
 
