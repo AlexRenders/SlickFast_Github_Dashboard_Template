@@ -1,7 +1,7 @@
 <p align="center">
   <img src="assets/showcase-teal.png" alt="SlickFast GitHub dashboard — teal showcase board" width="100%">
 </p>
-<p align="center"><sub>The <code>teal</code> layout — set <code>LAYOUT=teal</code> to get this exact board with your repo's live stats. KPIs, CI gauge, contribution calendar, commits trend, and language breakdown. SVG: <b>pixel-perfect at any zoom, ~35&nbsp;KB</b>. More layouts below ⬇</sub></p>
+<p align="center"><sub>⬆ This is the <code>teal-hero</code> layout. Set <code>LAYOUT=teal-hero</code> to get this exact board with your repo's live stats. More layouts below ⬇</sub></p>
 
 # 📈 Live GitHub Dashboard Template
 
@@ -36,11 +36,11 @@ exact template:
 
 | `LAYOUT` | Looks like | Best for |
 |---|---|---|
+| `teal-hero` | ⬆ the image above — KPIs, CI gauge, contribution calendar, commits + languages on dark teal | the showcase board |
 | `strip` *(default)* | [live example](https://api.slickfast.com/live/b2e8b5da04d2cb91f3bf081709b79fe9.svg) — 3 stats over 3 graphs (commits trend, commits bars, languages) | most READMEs |
 | `square` | [live example](https://api.slickfast.com/live/d065ee3966c3b861df8ae55cee378c96.svg) — 4 stats, commits graph below | compact |
 | `contributors` | [live example](https://api.slickfast.com/live/4f1c8602e8fefdd4336aadc505acefa0.svg) — stats + top-contributor bars + commits | team projects |
 | `graphs` | [live example](https://api.slickfast.com/live/bb8ec3f266428ac25ec20e09fb4b0c4c.svg) — commits + languages, all graphs | data lovers |
-| `teal` | [live example](https://api.slickfast.com/live/tt-teal.svg) — KPIs, CI gauge, contribution calendar, commits + languages on dark teal | the showcase board |
 | `ci` | [live example](https://api.slickfast.com/live/daa0532de1717e7b10754311d57c2aa7.svg) — a single CI-health gauge | a live "build passing" badge, upgraded |
 | `release` | [live example](https://api.slickfast.com/live/d702130dbed215ecc7884651f4c67905.svg) — a single latest-release tile (version, release date, updated stamp) | version badge, upgraded |
 | `light` | [live example](https://api.slickfast.com/live/25c0bd8bda1d7b9748fdf90b2709befa.svg) — the main board on white | light-mode READMEs |

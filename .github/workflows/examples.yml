@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        layout: [strip, square, contributors, graphs, teal, ci, release, light]
+        layout: [strip, square, contributors, graphs, teal-hero, ci, release, light]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

@@ -11,7 +11,7 @@
 // use the Action's built-in token — no personal token needed, ever.
 //
 // Layout: set repo variable LAYOUT to strip (default) | square | contributors |
-// graphs | teal | light.
+// graphs | teal-hero | light.
 
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 
@@ -160,11 +160,11 @@ function buildSpec(d) {
           data: { labels: d.langs.map((l) => l.label), series: [{ values: d.langs.map((l) => l.value), colors: d.langs.map(() => BLUE) }] } } },
       ] };
   }
-  if (cfg.layout === 'teal') {
+  if (cfg.layout === 'teal-hero') {
     const TB = '#0a0f14', TT = '#0f1720', TC = '#22d3ee';
     const tealColors = ['#22d3ee', '#2dd4bf', '#67e8f9', '#5eead4', '#a5f3fc'];
     const yr = new Date().getFullYear();
-    return { type: 'dashboard', title: `${cfg.repo}  ·  live`, background: TB,
+    return { type: 'dashboard', title: `${cfg.repo}  ·  teal hero`, background: TB,
       layout: { cols: 4, gap: 14, pad: 18, tileHeight: 150 },
       tiles: [
         { chart: { type: 'kpi', label: 'Stars', value: d.stars, background: TT, color: TC, fontSize: 26, sparkline: spark(d.stars) } },
@@ -231,9 +231,9 @@ function updateReadme(svgUrl) {
       wants === 'contributors' ? topContributors() : Promise.resolve([]),
       single ? Promise.resolve(null) : contributorCount(),
       single ? Promise.resolve([]) : languages(),
-      wants === 'ci' || wants === 'teal' ? ciGreenPct() : Promise.resolve(null),
+      wants === 'ci' || wants === 'teal-hero' ? ciGreenPct() : Promise.resolve(null),
       wants === 'release' ? latestReleaseInfo() : Promise.resolve(null),
-      wants === 'teal' ? commitsDailyCalendar() : Promise.resolve({}),
+      wants === 'teal-hero' ? commitsDailyCalendar() : Promise.resolve({}),
     ]);
     const d = { ...b, commits, top, contributorCount: cc, langs, ciPct, rel, calendarDays };
     console.log(`repo=${cfg.repo} layout=${cfg.layout} data=${JSON.stringify({ ...b, commits: commits.length, contributors: cc })}`);
